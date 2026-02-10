@@ -9,4 +9,12 @@ public class Client {
         this.nome = nome;
         this.colore = colore;
     }
-}
+
+
+    public int connetti(String nomeServer, int portaServer) {
+        return 0;
+    }
+    public void scrivi() {
+    }
+    }
+
