@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
     private String nome;
@@ -13,21 +14,33 @@ public class Client {
 
     public int connetti(String nomeServer, int portaServer) {
         try {
-
             this.socket = new Socket(nomeServer, portaServer);
-            System.out.println("Connesso la connessione");
             return 0;
         } catch (IOException e) {
-            System.out.println("Errore di connessione");
             return -1;
         }
     }
 
-    public void scrivi() {
+    public void comunica() {
+        try {
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            Scanner tastiera = new Scanner(System.in);
+            String tasto = "";
 
-    }
-
-    public void leggi() {
-
+            while (!tasto.equalsIgnoreCase("esci")) {
+                System.out.print("Scrivi un messaggio (o 'esci'): ");
+                tasto = tastiera.nextLine();
+                
+                writer.println(tasto); // Invia al server
+                
+                if (!tasto.equalsIgnoreCase("esci")) {
+                    String risposta = reader.readLine(); // Legge risposta del server
+                    System.out.println("Server dice: " + risposta);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
