@@ -3,13 +3,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    public Socket attendi;
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private int porta;
 
     public Server(int porta) {
-        this.porta = porta;
         try {
             this.serverSocket = new ServerSocket(porta);
         } catch (IOException e) {
@@ -17,47 +14,39 @@ public class Server {
         }
     }
 
-    public Socket attendi() {
+    public void attendi() {
         try {
             this.clientSocket = serverSocket.accept();
-            this.attendi = clientSocket;
-            return clientSocket;
         } catch (IOException e) {
-            return null;
+            e.printStackTrace();
         }
     }
 
-    public void scrivi() {
+    public void gestisciComunicazione() {
         try {
-            OutputStream outputStream = clientSocket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true);
-            writer.print("ciao ");
-            writer.flush();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+            String msg = "";
 
-    public void leggi() {
-        try {
-            InputStream inputStream = clientSocket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String msg = reader.readLine();
-            System.out.println(msg);
+            while (true) {
+                msg = reader.readLine();
+                if (msg == null || msg.equalsIgnoreCase("esci")) {
+                    System.out.println("Il client ha chiuso la comunicazione.");
+                    break; 
+                }
+                System.out.println("Client scrive: " + msg);
+                writer.println("Ricevuto: " + msg); // Risponde per conferma
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Connessione interrotta.");
         }
     }
 
     public void chiudi() {
-        try {
-            if (clientSocket != null) clientSocket.close();
-        } catch (IOException e) {}
+        try { if (clientSocket != null) clientSocket.close(); } catch (IOException e) {}
     }
-
+    
     public void termina() {
-        try {
-            if (serverSocket != null) serverSocket.close();
-        } catch (IOException e) {}
+        try { if (serverSocket != null) serverSocket.close(); } catch (IOException e) {}
     }
 }
